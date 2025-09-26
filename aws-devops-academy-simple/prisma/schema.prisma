@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String?
+  email     String   @unique
+  image     String?
+  purchases Purchase[]
+  createdAt DateTime @default(now())
+}
+
+model Purchase {
+  id         String   @id @default(cuid())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  orderId    String   // razorpay order id or payment id
+  amount     Int
+  currency   String
+  createdAt  DateTime @default(now())
+}
+
+model Course {
+  id       String  @id @default(cuid())
+  slug     String  @unique
+  title    String
+  lessons  Lesson[]
+}
+
+model Lesson {
+  id         String @id @default(cuid())
+  title      String
+  sourceType String // "youtube" | "external" | "self"
+  videoUrl   String
+  course     Course @relation(fields: [courseId], references: [id])
+  courseId   String
+}
